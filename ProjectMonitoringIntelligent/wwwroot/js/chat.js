@@ -39,4 +39,5 @@ connection.on("ReceiveData", function (data) {
     var li = document.createElement("li");
     li.textContent = data;
     document.getElementById("messagesList").appendChild(li);
+
 });

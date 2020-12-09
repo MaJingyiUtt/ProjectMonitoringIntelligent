@@ -16,27 +16,20 @@ namespace SignalRChat.Hubs
 
         public async Task SendData()
         {
-           
-                var reader = new StreamReader(File.OpenRead(@"C:\Users\majingyi\source\repos\ProjectMonitoringIntelligent\ProjectMonitoringIntelligent\csv\temperature.csv"));
-                List<string> listA = new List<string>();
-                while (!reader.EndOfStream)
-                {
-                    var line = reader.ReadLine();
-                    var values = line.Split(';');
-
-                    listA.Add(values[0]);
-                    foreach (var coloumn1 in listA)
-                    {
-                        System.Threading.Thread.Sleep(1000);
-                var data = 0;
-                await Clients.All.SendAsync("ReceiveData", coloumn1);
-                    }
-                }
-
-
+            var reader = new StreamReader(File.OpenRead(@"C:\Users\majingyi\source\repos\ProjectMonitoringIntelligent\ProjectMonitoringIntelligent\csv\temperature.csv"));
                 
-
-
+            List<string> listA = new List<string>();
+            string line;
+            while ((line = reader.ReadLine()) != null)
+            {
+                if (line.Length != 0 & line!= "temperature;EnqueuedTime;ConnectionDeviceId")
+                {
+                    var temp = line.Split(';')[0];
+                    System.Threading.Thread.Sleep(1000);
+                    await Clients.All.SendAsync("ReceiveData", temp);
+                }
+                
+            }
         }
     }
 }
