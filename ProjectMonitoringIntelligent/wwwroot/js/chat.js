@@ -2,21 +2,63 @@
 
 var connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
 
-//Disable send button until connection is established
-//document.getElementById("sendButton").disabled = true;
+    var config = {
+        // The type of chart we want to create
+        type: 'line',
 
-/*
-connection.on("ReceiveMessage", function (user, message) {
-    var msg = message.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    var encodedMsg = user + " says " + msg;
-    var li = document.createElement("li");
-    li.textContent = encodedMsg;
-    document.getElementById("messagesList").appendChild(li);
-});
-*/
+        // The data for our dataset
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Température',
+                backgroundColor: 'rgb(255, 99, 132)',
+                borderColor: 'rgb(255, 99, 132)',
+                data: []
+            }]
+        },
+
+        // Configuration options go here
+        options: {
+            responsive: true,
+            title: {
+                display: true,
+                text: 'Monitoring Intelligent'
+            },
+            tooltips: {
+                mode: 'index',
+                intersect: false,
+            },
+            hover: {
+                mode: 'nearest',
+                intersect: true
+            },
+            scales: {
+                xAxes: [{
+                    display: true,
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Temps'
+                    }
+                }],
+                yAxes: [{
+                    display: true,
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Value'
+                    },
+                    ticks: {
+                        suggestedMin: 26.5,
+                        suggestedMax: 29.5
+                    }
+                }]
+            }
+        }
+}
+
+var ctx = document.getElementById('myChart').getContext('2d');
+    window.myLine = new Chart(ctx, config);
 
 connection.start().then(function () {
-    //document.getElementById("sendButton").disabled = false;
     connection.invoke("SendData").catch(function (err) {
         return console.error(err.toString());
     });
@@ -24,20 +66,9 @@ connection.start().then(function () {
     return console.error(err.toString());
 });
 
-/*
-document.getElementById("sendButton").addEventListener("click", function (event) {
-    var user = document.getElementById("userInput").value;
-    var message = document.getElementById("messageInput").value;
-    connection.invoke("SendMessage", user, message).catch(function (err) {
-        return console.error(err.toString());
-    });
-    event.preventDefault();
-});
-*/
-
 connection.on("ReceiveData", function (data) {
-    var li = document.createElement("li");
-    li.textContent = data;
-    document.getElementById("messagesList").appendChild(li);
-
+    config.data.labels.push("");
+    config.data.datasets[0].data.push(data);
+    window.myLine.update();
 });
+
